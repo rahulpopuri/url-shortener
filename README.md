@@ -25,7 +25,7 @@ MYSQL_TABLE_NAME
 ## Usage
 - Send a POST request with the url to shorten:
 ```
-curl -d "www.google.com" -X POST http://spring-boot-url-shortener.herokuapp.com/url
+curl -d "http://www.google.com" -X POST http://spring-boot-url-shortener.herokuapp.com/url
 ```
 which will return the shortened url to you
 
@@ -33,7 +33,7 @@ which will return the shortened url to you
 ```
 curl -X GET http://spring-boot-url-shortener.herokuapp.com/url/{shorturl}
 ```
-which should return www.google.com
+which should return http://www.google.com
 
 ## How It Works
 
