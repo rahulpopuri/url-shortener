@@ -8,7 +8,6 @@ import org.springframework.util.ResourceUtils;
 
 @Service
 public class UrlShortenerServiceImpl implements UrlShortenerService {
-    private static Long simpleCounter = 0L;
 
     @Autowired
     private UrlShortenerRepository urlShortenerRepository;
@@ -17,7 +16,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService {
     public String retrieveUrl(String shortUrl) {
         int id = UrlShortener.decode(shortUrl);
         if (id < 0) {
-            return null;
+            return "URL not found";
         }
         return urlShortenerRepository.getUrl(id);
     }
