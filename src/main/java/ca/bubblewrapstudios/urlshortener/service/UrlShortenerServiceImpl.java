@@ -1,46 +1,33 @@
 package ca.bubblewrapstudios.urlshortener.service;
 
-import ca.bubblewrapstudios.urlshortener.model.Url;
+import ca.bubblewrapstudios.urlshortener.dao.UrlShortenerRepository;
+import ca.bubblewrapstudios.urlshortener.util.UrlShortener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.util.ResourceUtils;
 
 @Service
 public class UrlShortenerServiceImpl implements UrlShortenerService {
     private static Long simpleCounter = 0L;
 
+    @Autowired
+    private UrlShortenerRepository urlShortenerRepository;
 
-    /**
-     * Simple 'shortener' - returns a url ending with an auto incremented counter
-     *
-     * @param urlToShorten
-     * @return Url
-     */
     @Override
-    public Url simpleShortenUrl(String urlToShorten) {
-        simpleCounter++;
-        Url url = new Url();
-        url.setUrl(urlToShorten);
-        url.setShortUrl(getBaseEnvLinkURL() + "/" + simpleCounter);
-        return url;
+    public String retrieveUrl(String shortUrl) {
+        int id = UrlShortener.decode(shortUrl);
+        if (id < 0) {
+            return null;
+        }
+        return urlShortenerRepository.getUrl(id);
     }
 
-    private String getBaseEnvLinkURL() {
-        String baseEnvLinkURL;
-        HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.
-                        currentRequestAttributes()).getRequest();
-        // lazy about determining protocol but can be done too
-        baseEnvLinkURL = "http://" + currentRequest.getLocalName();
-        if (currentRequest.getLocalPort() != 80) {
-            baseEnvLinkURL += ":" + currentRequest.getLocalPort();
+    @Override
+    public String shortenUrl(String url) {
+        if (!ResourceUtils.isUrl(url)) {
+            return "Not a valid url: " + url;
         }
-        if (!StringUtils.isEmpty(currentRequest.getContextPath())) {
-            baseEnvLinkURL += currentRequest.getContextPath();
-        }
-        return baseEnvLinkURL;
+        return UrlShortener.encode(urlShortenerRepository.addNewUrl(url));
     }
+
 }
